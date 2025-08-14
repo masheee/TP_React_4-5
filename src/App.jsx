@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Footer from './components/Footer'
+import FormularioTarea from './components/FormularioTarea'
 
 
 function App() {
@@ -8,8 +9,8 @@ function App() {
   return (
       <>
         <main className="container my-4">
-          <h1>hola mundo</h1>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Velit aliquid magnam sunt vero laudantium ea modi dignissimos. Ea, ad non?</p>
+          <h1 className="text-center">Lista de tareas</h1>
+          <FormularioTarea/>
         </main>
         <Footer/>
       </>

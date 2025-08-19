@@ -25,6 +25,12 @@ const FormularioTarea = () => {
         reset()
     }
 
+    const borrarTarea = (nombreTarea)=>{
+        const tareasFiltradas = tareas.filter((itemTarea)=> itemTarea !== nombreTarea);
+
+        setTareas(tareasFiltradas);
+    }
+
     return (
         <section>
              <Form onSubmit={handleSubmit(postValidacion)}>
@@ -47,7 +53,7 @@ const FormularioTarea = () => {
                 </Form.Group>
             <Form.Text className="text-danger">{errors.tarea?.message}</Form.Text>
              </Form>
-             <ListaTareas tareas={tareas} />
+             <ListaTareas tareas={tareas} borrarTarea={borrarTarea}/>
         </section>
     );
 };

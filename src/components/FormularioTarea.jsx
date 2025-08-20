@@ -2,7 +2,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import ListaTareas from "./ListaTarea";
 import { useForm } from "react-hook-form"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 
@@ -15,10 +15,15 @@ const FormularioTarea = () => {
         formState: { errors },
     } = useForm();
 
-    const [tareas, setTareas] = useState([]);
+    const tareasLocalStorage = JSON.parse(localStorage.getItem('tareasKey')) || []
+
+    const [tareas, setTareas] = useState(tareasLocalStorage);
+
+    useEffect(()=>{
+        localStorage.setItem('tareasKey', JSON.stringify(tareas))
+    },[tareas])
 
     const postValidacion = (data) => {
-        console.log(data.tarea);
         //guardar tarea en el array
         setTareas([...tareas, data.tarea])
         //limpiar el formulario

@@ -3,7 +3,8 @@ import Form from "react-bootstrap/Form";
 import ListaTareas from "./ListaTarea";
 import { useForm } from "react-hook-form"
 import { useEffect, useState } from "react";
-
+import { crearTarea, listarTarea, borrarTarea } from '../helpers/queries.js'
+import Swal from "sweetalert2";
 
 
 const FormularioTarea = () => {
@@ -15,25 +16,67 @@ const FormularioTarea = () => {
         formState: { errors },
     } = useForm();
 
-    const tareasLocalStorage = JSON.parse(localStorage.getItem('tareasKey')) || []
+    const [tareas, setTareas] = useState([]);
 
-    const [tareas, setTareas] = useState(tareasLocalStorage);
-
-    useEffect(()=>{
-        localStorage.setItem('tareasKey', JSON.stringify(tareas))
-    },[tareas])
-
-    const postValidacion = (data) => {
-        //guardar tarea en el array
-        setTareas([...tareas, data.tarea])
-        //limpiar el formulario
-        reset()
+    //funcion para obtener las tareas del backend 
+    const obtenerTareas = async() => {
+        try {
+            const respuesta = await listarTarea()
+            if (respuesta.status === 200) {
+                const tareasObtenidas = await respuesta.json()
+                setTareas(tareasObtenidas)
+            }
+        } catch (error) {
+            console.error("Error al obtener tareas: ",error)
+        }
     }
 
-    const borrarTarea = (nombreTarea)=>{
-        const tareasFiltradas = tareas.filter((itemTarea)=> itemTarea !== nombreTarea);
+    useEffect(()=>{
+        obtenerTareas() 
+    },[])
 
-        setTareas(tareasFiltradas);
+    const postValidacion = async (data) => {
+        
+        const nuevaTarea = {
+            nombreTarea: data.tarea
+        }
+
+        const respuesta = await crearTarea(nuevaTarea)
+        if(respuesta.status === 201){
+            Swal.fire({
+                title: "Tarea Creada",
+                text: `La tarea "${data.tarea}" se agregó correctamente`,
+                icon: "success",
+            })
+            reset()
+            obtenerTareas()
+        } else {
+            Swal.fire({
+                title: "Error",
+                text: "No se pudo crear la tarea. Inténtalo más tarde.",
+                icon: "error",
+            });
+        }
+    }
+
+    //logica para borrar tareas del backend
+    const eliminarTarea = async (idTarea) => {
+
+        const respuesta = await borrarTarea(idTarea)
+        if (respuesta.status === 200) {
+            Swal.fire({
+                title: "Tarea Eliminada",
+                text: `La tarea fue eliminada correctamente`,
+                icon: "success",
+            });
+            obtenerTareas()
+        } else {
+            Swal.fire({
+                title: "Error",
+                text: "La tarea no pudo ser eliminada",
+                icon: "error",
+            })
+        }
     }
 
     return (
@@ -58,7 +101,7 @@ const FormularioTarea = () => {
                 </Form.Group>
             <Form.Text className="text-danger">{errors.tarea?.message}</Form.Text>
              </Form>
-             <ListaTareas tareas={tareas} borrarTarea={borrarTarea}/>
+             <ListaTareas tareas={tareas} borrarTarea={eliminarTarea}/>
         </section>
     );
 };

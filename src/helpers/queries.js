@@ -38,3 +38,25 @@ export const borrarTarea = async (id) => {
         return null
     }
 }
+
+export const editarTarea = async (id, tarea) => {
+    try {
+        const urlFinal = tareasBackend + '/' + id;
+        
+        // Agrega este log para ver la URL completa antes de hacer la llamada
+        console.log("URL de PUT siendo llamada:", urlFinal); // <-- ¡Añade esto!
+
+        const respuesta = await fetch(tareasBackend+'/'+id,{
+            method: 'PUT',
+            headers: {
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify(tarea)
+        })
+        console.log(respuesta)
+        return respuesta
+    } catch (error) {
+        console.error(error)
+        return null
+    }
+}
